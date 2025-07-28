@@ -3,9 +3,6 @@ import psycopg2
 import os
 from datetime import datetime
 from urllib.parse import urlparse
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "clave-secreta-super-robusta-123"
