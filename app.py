@@ -47,6 +47,7 @@ def init_db():
                 "Pacheco",
                 "Mike",
                 "Zamorano",
+                "Juan José",
             ]
             for nombre in repartidores_fijos:
                 c.execute(
@@ -131,13 +132,16 @@ def registrar():
         codigos = [c.strip().upper() for c in raw_codigos.split(",") if c.strip()]
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        mensajes_exito = []
+        mensajes_error = []
+
         with get_conn() as conn:
             with conn.cursor() as cur:
                 if tipo == "salida":
                     repartidor_id = int(request.form["repartidor"])
 
                     for codigo in codigos:
-                        # Verificar salida sin entrada
+                        
                         cur.execute(
                             """
                             SELECT repartidor_id
@@ -172,7 +176,7 @@ def registrar():
                         """,
                             (codigo, repartidor_id, fecha_hora),
                         )
-                        flash(f"Salida registrada para {codigo}.", "success")
+                        mensajes_exito.append(codigo)
 
                 elif tipo == "entrada":
                     for codigo in codigos:
@@ -196,10 +200,7 @@ def registrar():
                         salida_pendiente = cur.fetchone()
 
                         if not salida_pendiente or salida_pendiente[0] is None:
-                            flash(
-                                f"⚠️ No se puede registrar entrada para {codigo} (no tiene salida activa).",
-                                "danger",
-                            )
+                            mensajes_error.append(codigo)
                             continue
 
                         cur.execute(
@@ -209,9 +210,21 @@ def registrar():
                         """,
                             (codigo, salida_pendiente[0], fecha_hora),
                         )
-                        flash(f"Entrada registrada para {codigo}.", "success")
+                        mensajes_exito.append(codigo)
 
             conn.commit()
+
+        if mensajes_exito:
+            flash(
+                f"{tipo.capitalize()} registrada para: {', '.join(mensajes_exito)}",
+                "success",
+            )
+        if mensajes_error:
+            flash(
+                f"⚠️ No se pudo registrar entrada para: {', '.join(mensajes_error)} (sin salida activa)",
+                "danger",
+            )
+
         return redirect(url_for("registrar"))
 
     return render_template("registrar.html", repartidores=repartidores)
