@@ -178,15 +178,18 @@ def registrar():
                     for codigo in codigos:
                         cur.execute(
                             """
-                            SELECT repartidor_id, MAX(fecha_hora)
-                            FROM movimientos
-                            WHERE codigo = %s AND tipo = 'salida'
+                            SELECT repartidor_id
+                            FROM movimientos m1
+                            WHERE m1.codigo = %s
+                            AND m1.tipo = 'salida'
                             AND NOT EXISTS (
                                 SELECT 1 FROM movimientos m2
-                                WHERE m2.codigo = movimientos.codigo
-                                AND m2.tipo = 'entrada'
-                                AND m2.fecha_hora > movimientos.fecha_hora
+                                WHERE m2.codigo = m1.codigo
+                                    AND m2.tipo = 'entrada'
+                                    AND m2.fecha_hora > m1.fecha_hora
                             )
+                            ORDER BY m1.fecha_hora DESC
+                            LIMIT 1
                         """,
                             (codigo,),
                         )
