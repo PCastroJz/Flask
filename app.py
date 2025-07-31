@@ -17,8 +17,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
-
-print("Conectando a:", DATABASE_URL)
+# DATABASE_URL = ""
 
 def time_passed(delta):
     if not isinstance(delta, timedelta):
@@ -43,7 +42,7 @@ app.jinja_env.filters['time_passed'] = time_passed
 
 
 def get_conn():
-    return psycopg2.connect(DATABASE_URL, sslmode="require")
+    return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 def init_db():
@@ -169,7 +168,7 @@ def get_jabas_regresadas_por_repartidor(rid):
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                    SELECT codigo, fecha_hora
+                    SELECT id, codigo, fecha_hora
                     FROM movimientos
                     WHERE tipo = 'entrada'
                     AND repartidor_id = %s
