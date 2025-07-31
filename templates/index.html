@@ -1,137 +1,65 @@
-<!DOCTYPE html>
-<html lang="es" class="h-100">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jabas por Repartidor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4a6bff;
-            --secondary-color: #f8f9fa;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f5f7ff;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .navbar-brand {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--card-shadow);
-        }
-
-        .card-title {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: 8px;
-            padding: 8px 16px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 0;
-            color: #6c757d;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #dee2e6;
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 20px 0;
-            background-color: white;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-box-seam me-2"></i>TrackJabas
-            </a>
-            <div class="d-flex">
-                <a href="{{ url_for('registrar') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1"></i> Registrar
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container my-4 flex-grow-1">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h4 mb-0">
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h4 mb-0 fw-bold text-primary">
                 <i class="bi bi-truck me-2"></i>Repartidores con jabas pendientes
             </h2>
-            <span class="badge bg-primary rounded-pill">{{ cards|length }}</span>
+            <p class="text-muted mb-0">Resumen de movimientos pendientes</p>
         </div>
+        <div>
+            <a href="{{ url_for('registrar') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Registrar movimiento
+            </a>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="alert alert-info mb-0">
+                <strong>Jabas salieron hoy:</strong> {{ total_salida }}<br>
+                <strong>Jabas devueltas hoy:</strong> {{ total_entrada }}
+            </div>
+        </div>
+    </div>
 
-        <div class="row g-3">
-            {% for id, nombre, total in cards %}
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card bg-white h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0">{{ nombre }}</h5>
-                            <span class="badge bg-light text-primary rounded-pill">{{ total }}</span>
-                        </div>
-                        <p class="text-muted small mb-3">Jabas pendientes</p>
-                        <a href="{{ url_for('detalle', rid=id) }}" class="btn btn-sm btn-outline-primary w-100">
-                            <i class="bi bi-eye me-1"></i> Ver detalles
+    {% if cards %}
+    <div class="row g-4">
+        {% for id, nombre, total, ultima_fecha in cards %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0 fw-bold">{{ nombre }}</h5>
+                        <span class="badge bg-primary rounded-pill">{{ total }} jaba(s)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                        Última actualización:
+                        {% if ultima_fecha %}
+                            {{ ultima_fecha.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            Sin movimientos
+                        {% endif %}
+                    </small>
+                        <a href="{{ url_for('detalle', rid=id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i> Detalles
                         </a>
                     </div>
                 </div>
             </div>
-            {% else %}
-            <div class="col-12">
-                <div class="empty-state">
-                    <i class="bi bi-check-circle"></i>
-                    <h4>Todo al día</h4>
-                    <p>No hay jabas pendientes en este momento.</p>
-                    <a href="{{ url_for('registrar') }}" class="btn btn-primary mt-2">
-                        <i class="bi bi-plus-circle me-1"></i> Registrar primera jaba
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
         </div>
-    </main>
-
-    <footer class="text-center text-muted">
-        <div class="container">
-            <p class="mb-0">© 2023 TrackJabas • Sistema de seguimiento de jabas</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-check2-circle"></i>
+        <h4>Todo al día</h4>
+        <p>No hay jabas pendientes en este momento.</p>
+        <a href="{{ url_for('registrar') }}" class="btn btn-primary mt-3">
+            <i class="bi bi-plus-circle me-1"></i> Registrar primera jaba
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

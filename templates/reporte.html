@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="h4 mb-4 fw-bold text-primary">
+        <i class="bi bi-bar-chart-line me-2"></i> Reporte diario de movimientos
+    </h2>
+    <form method="POST" class="mb-4 d-flex align-items-end gap-3">
+        <div>
+            <label for="fecha" class="form-label">Selecciona el día</label>
+            <input type="date" class="form-control" name="fecha" id="fecha" value="{{ fecha }}" required>
+        </div>
+        <div>
+            <label for="repartidor" class="form-label">Repartidor</label>
+            <select class="form-select" name="repartidor" id="repartidor">
+                <option value="">Todos</option>
+                {% for id, nombre in repartidores %}
+                <option value="{{ id }}" {% if rid and rid|string == id|string %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Ver reporte</button>
+    </form>
+    <form method="POST" action="{{ url_for('reporte_pdf') }}" class="d-inline ms-2">
+        <input type="hidden" name="fecha" value="{{ fecha }}">
+        <input type="hidden" name="repartidor" value="{{ rid }}">
+        <button type="submit" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Exportar PDF
+        </button>
+    </form>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-white fw-bold">Jabas llevadas</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Repartidor</th><th>Cantidad</th></tr></thead>
+                        <tbody>
+                        {% for nombre, cantidad in llevadas %}
+                        <tr><td>{{ nombre }}</td><td>{{ cantidad }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-white fw-bold">Jabas devueltas</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Repartidor</th><th>Cantidad</th></tr></thead>
+                        <tbody>
+                        {% for nombre, cantidad in devueltas %}
+                        <tr><td>{{ nombre }}</td><td>{{ cantidad }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-white fw-bold">Jabas pendientes</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Repartidor</th><th>Cantidad</th></tr></thead>
+                        <tbody>
+                        {% for nombre, cantidad in pendientes %}
+                        <tr><td>{{ nombre }}</td><td>{{ cantidad }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mt-4">
+        <div class="card-header bg-white fw-bold">Movimientos detallados del día</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Repartidor</th>
+                            <th>Código de jaba</th>
+                            <th>Tipo</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nombre, codigo, tipo, fecha_hora in movimientos_detalle %}
+                        <tr>
+                            <td>{{ nombre }}</td>
+                            <td>{{ codigo }}</td>
+                            <td>
+                                {% if tipo == 'salida' %}
+                                    <span class="badge bg-warning text-dark">Salida</span>
+                                {% else %}
+                                    <span class="badge bg-success">Entrada</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ fecha_hora.strftime('%H:%M') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No hay movimientos para este día</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

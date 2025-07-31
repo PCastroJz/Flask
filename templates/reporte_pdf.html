@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte diario PDF</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+        h2 { color: #4a6bff; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+        th { background: #f5f7ff; }
+        .section-title { margin-top: 20px; margin-bottom: 5px; font-size: 15px; color: #333; }
+    </style>
+</head>
+<body>
+    <h2>Reporte diario de movimientos</h2>
+    <p><strong>Fecha:</strong> {{ fecha }}</p>
+    <div class="section-title">Jabas llevadas</div>
+    <table>
+        <thead><tr><th>Repartidor</th><th>Cantidad</th></tr></thead>
+        <tbody>
+        {% for nombre, cantidad in llevadas %}
+        <tr><td>{{ nombre }}</td><td>{{ cantidad }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="section-title">Jabas devueltas</div>
+    <table>
+        <thead><tr><th>Repartidor</th><th>Cantidad</th></tr></thead>
+        <tbody>
+        {% for nombre, cantidad in devueltas %}
+        <tr><td>{{ nombre }}</td><td>{{ cantidad }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="section-title">Jabas pendientes</div>
+    <table>
+        <thead><tr><th>Repartidor</th><th>Cantidad</th></tr></thead>
+        <tbody>
+        {% for nombre, cantidad in pendientes %}
+        <tr><td>{{ nombre }}</td><td>{{ cantidad }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="section-title">Movimientos detallados del día</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Repartidor</th>
+                <th>Código de jaba</th>
+                <th>Tipo</th>
+                <th>Hora</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nombre, codigo, tipo, fecha_hora in movimientos_detalle %}
+            <tr>
+                <td>{{ nombre }}</td>
+                <td>{{ codigo }}</td>
+                <td>{% if tipo == 'salida' %}Salida{% else %}Entrada{% endif %}</td>
+                <td>{{ fecha_hora.strftime('%H:%M') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No hay movimientos para este día</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Editar movimiento: <span class="badge bg-light text-dark font-monospace">{{ codigo }}</span></h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo de movimiento</label>
+                            <select class="form-select" name="tipo" id="tipo" required>
+                                <option value="salida" {% if mov[0] == 'salida' %}selected{% endif %}>Salida</option>
+                                <option value="entrada" {% if mov[0] == 'entrada' %}selected{% endif %}>Entrada</option>
+                            </select>
+                        </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const codigoInput = document.getElementById('codigo');
+        if (codigoInput) {
+            codigoInput.focus();
+            codigoInput.addEventListener('input', function () {
+                let val = codigoInput.value.replace(/[^\d]/g, '');
+                let grupos = val.match(/\d{1,3}/g) || [];
+                // Elimina duplicados
+                let unicos = [];
+                grupos.forEach(function(c) {
+                    if (!unicos.includes(c)) {
+                        unicos.push(c);
+                    }
+                });
+                let nuevoValor = unicos.join(',');
+                if (codigoInput.value !== nuevoValor) {
+                    codigoInput.value = nuevoValor;
+                }
+            });
+        }
+    });
+</script>
+                        <div class="mb-3">
+                            <label for="fecha_hora" class="form-label">Fecha y hora</label>
+                            <input type="datetime-local" class="form-control" name="fecha_hora" id="fecha_hora" value="{{ mov[1].strftime('%Y-%m-%dT%H:%M') }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="repartidor" class="form-label">Repartidor</label>
+                            <select class="form-select" name="repartidor" id="repartidor" required>
+                                {% for id, nombre in repartidores %}
+                                <option value="{{ id }}" {% if mov[2] == id %}selected{% endif %}>{{ nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-save me-1"></i> Guardar cambios
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
